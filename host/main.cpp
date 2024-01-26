@@ -35,7 +35,7 @@ int main(int argc, const char **argv)
         return 1;
     }
 
-    if (ret != 0)
+    if (ret < 0)
         std::cerr << "Error: " << strerror(-ret) << std::endl;
 
     return ret;
@@ -45,7 +45,7 @@ template<typename F>
 static int run(F f)
 {
     if (getuid() != 0 && setuid(0) != 0)
-        throw std::runtime_error("permissions");
+        std::cerr << "Warn: Cannot get root permissions" << std::endl;
 
     auto api = KernelApi::create();
     if (!api.has_value())
