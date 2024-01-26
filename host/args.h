@@ -4,16 +4,12 @@
 #include <optional>
 #include <string>
 
+#include "color.h"
+
 enum struct Command {
     unknown = 0,
     init,
     setColor,
-};
-
-struct Color {
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
 };
 
 class Args

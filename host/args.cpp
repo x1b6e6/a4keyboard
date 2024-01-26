@@ -46,7 +46,7 @@ void Args::print_help() const
     std::cerr << "\n";
     std::cerr << "COMMAND:\n";
     std::cerr << "    init           initialize device\n";
-    std::cerr << "    color COLOR    set color\n";
+    std::cerr << "    color COLOR    set color in HEX format\n";
     std::cerr << std::endl;
 }
 

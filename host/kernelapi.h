@@ -3,6 +3,8 @@
 #include <cstdint>
 #include <optional>
 
+#include "types.h"
+
 struct kernel_bpf_c;
 
 class KernelApi
@@ -13,7 +15,7 @@ public:
     KernelApi(KernelApi &&other);
     ~KernelApi();
 
-    int write(int hid, const uint8_t (&data)[64]);
+    int write(u32 hid, const u8 (&data)[64]);
 
     static std::optional<KernelApi> create();
 

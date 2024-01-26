@@ -5,19 +5,8 @@
 #include <unistd.h>
 
 #include "args.h"
-#include "cmd.h"
 #include "device.h"
 #include "kernelapi.h"
-
-static constexpr std::string_view a4techBloody = "hid:b0003g0001v000009DAp0000FA10";
-
-static bool descriptor(const std::string &modalias, const std::vector<uint8_t> &desc)
-{
-    if (modalias == a4techBloody)
-        return desc.size() == 133;
-
-    return false;
-}
 
 static int runCommand(const Args &args);
 
@@ -29,7 +18,6 @@ int main(int argc, const char **argv)
 
     try {
         ret = runCommand(args);
-
     } catch (std::exception &e) {
         std::cerr << e.what() << std::endl;
         return 1;
@@ -42,7 +30,7 @@ int main(int argc, const char **argv)
 }
 
 template<typename F>
-static int run(F f)
+static inline int run(F f)
 {
     if (getuid() != 0 && setuid(0) != 0)
         std::cerr << "Warn: Cannot get root permissions" << std::endl;
@@ -51,7 +39,7 @@ static int run(F f)
     if (!api.has_value())
         throw std::runtime_error("Cannot connect to kernel");
 
-    auto dev = Device::find(*api, {a4techBloody}, descriptor);
+    auto dev = Device::find(*api);
     if (!dev.has_value())
         throw std::runtime_error("Cannot find device");
 
@@ -64,7 +52,7 @@ static int runCommand(const Args &args)
 {
     switch (args.command()) {
     case Command::init:
-        return run(cmd::init);
+        return run([](const std::unique_ptr<Device> &dev) { return dev->init(); });
     case Command::setColor: {
         auto color = args.color();
         if (!color.has_value()) {
@@ -74,7 +62,7 @@ static int runCommand(const Args &args)
 
         using namespace std::placeholders;
 
-        return run(std::bind(cmd::setColor, _1, color.value()));
+        return run([&](const std::unique_ptr<Device> &dev) { return dev->setColor(*color); });
     }
     default:
         args.print_help();

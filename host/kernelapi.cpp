@@ -30,7 +30,7 @@ std::optional<KernelApi> KernelApi::create()
     return std::nullopt;
 }
 
-int KernelApi::write(int hid, const uint8_t (&data)[64])
+int KernelApi::write(u32 hid, const u8 (&data)[64])
 {
     struct write_args args;
 
