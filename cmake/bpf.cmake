@@ -1,7 +1,3 @@
-if(NOT DEFINED CMAKE_BPF_COMPILER)
-    set(CMAKE_BPF_COMPILER ${CMAKE_C_COMPILER} -target bpf)
-endif()
-
 if (NOT DEFINED CMAKE_BPFTOOL)
     set(CMAKE_BPFTOOL bpftool)
 endif()
