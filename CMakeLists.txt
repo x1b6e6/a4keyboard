@@ -16,5 +16,6 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 
 include(cmake/bpf.cmake)
 
+add_subdirectory(assets)
 add_subdirectory(bpf)
 add_subdirectory(host)

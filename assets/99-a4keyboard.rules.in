@@ -1,0 +1,6 @@
+ACTION!="add", GOTO="a4keyboard_end"
+SUBSYSTEM!="usb", GOTO="a4keyboard_end"
+
+ATTR{idVendor}=="09da", ATTR{idProduct}=="fa10", RUN+="@CMAKE_INSTALL_PREFIX@/bin/a4keyboard init"
+
+LABEL="a4keyboard_end"
