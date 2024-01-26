@@ -9,11 +9,11 @@
 #include "device.h"
 #include "kernelapi.h"
 
-static constexpr std::string_view bloodyE975 = "hid:b0003g0001v000009DAp0000FA10";
+static constexpr std::string_view a4techBloody = "hid:b0003g0001v000009DAp0000FA10";
 
 static bool descriptor(const std::string &modalias, const std::vector<uint8_t> &desc)
 {
-    if (modalias == bloodyE975)
+    if (modalias == a4techBloody)
         return desc.size() == 133;
 
     return false;
@@ -51,7 +51,7 @@ static int run(F f)
     if (!api.has_value())
         throw std::runtime_error("Cannot connect to kernel");
 
-    auto dev = Device::find(*api, {bloodyE975}, descriptor);
+    auto dev = Device::find(*api, {a4techBloody}, descriptor);
     if (!dev.has_value())
         throw std::runtime_error("Cannot find device");
 
