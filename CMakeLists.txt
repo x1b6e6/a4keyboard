@@ -18,4 +18,4 @@ include(cmake/bpf.cmake)
 
 add_subdirectory(assets)
 add_subdirectory(bpf)
-add_subdirectory(host)
+add_subdirectory(src)
