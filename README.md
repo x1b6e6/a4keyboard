@@ -25,7 +25,7 @@ Duration of my program is ~30ms (`color` command) whats take possibilities to ma
 
 ## Install dependencies
 
-- Archlinux
+* Archlinux
 
   ```shell
   pacman -Sy --needed cmake clang ninja bpf libbpf lib32-gcc-libs
@@ -68,9 +68,3 @@ a4keyboard init # or just reconnect keyboard
 a4keyboard color f00 # set red color (short form)
 a4keyboard color 00FF00 # set green color (long form)
 ```
-
-## Tested devices
-
-|   Type   |      Name     |  VID   |  PID   |
-|----------|---------------|--------|--------|
-| keyboard | A4Tech Bloody | `09DA` | `FA10` |
