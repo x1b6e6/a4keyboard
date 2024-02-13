@@ -26,6 +26,7 @@ jobs:
       uses: actions/cache/restore@v4
       with:
         path: .cache
+        key: cache
 
     - name: Download QEMU image
       if: steps.cache-restore != 'true'
@@ -64,3 +65,4 @@ jobs:
       uses: actions/cache/save@v4
       with:
         path: .cache
+        key: cache
