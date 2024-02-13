@@ -1,0 +1,77 @@
+name: Build in Arch Linux inside QEMU
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  VM_IMAGE_URL: https://gitlab.archlinux.org/archlinux/arch-boxes/-/package_files/5954/download
+  VM_IMAGE_PATH: ${{github.workspace}}/.cache/vm-image.qcow2
+  SSHPASS: arch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -y wget qemu-system-x86-64 ssh sshpass
+
+    - name: Restore cached QEMU image
+      id: cache-restore
+      uses: actions/cache/restore@v4
+      with:
+        path: .cache
+        key: ${{env.VM_IMAGE_URL}}
+
+    - name: Download QEMU image
+      if: steps.cache-restore != 'true'
+      run: |
+          mkdir ${{github.workspace}}/.cache
+          wget -O "${{env.VM_IMAGE_PATH}}" "${{env.VM_IMAGE_URL}}"
+
+    - name: Run QEMU and build 
+      run: |
+          export SSHPASS=${{env.SSHPASS}}
+          qemu-system-x86_64 \
+              -m 512 \
+              -net nic -net user,hostfwd=tcp::2222-:22 \
+              -drive file="${{env.VM_IMAGE_PATH}}",if=virtio \
+              -virtfs local,path=${{github.workspace}},mount_tag=host0,security_model=passthrough,id=host0 \
+              -nographic &
+          timeout 15m sh -c "while ! sshpass -e ssh -o ConnectTimeout=2 -o StrictHostKeyChecking=no -l arch -p 2222 localhost sudo true; do sleep 1; done"
+          sshpass -e ssh -o StrictHostKeyChecking=no -l arch -p 2222 localhost bash -eux <<EOF
+              trap 'sudo shutdown now' EXIT
+              readonly PROJECTDIR=/project
+              sudo mkdir "\$PROJECTDIR"
+              sudo mount -t 9p -o trans=virtio,version=9p2000.L host0 "\$PROJECTDIR"
+              sudo pacman-key --init
+              sudo pacman-key --populate archlinux
+              sudo pacman -Sy --noconfirm --needed archlinux-keyring
+              sudo pacman -Su  --noconfirm --needed cmake clang ninja bpf libbpf lib32-gcc-libs
+              cd /project
+              cmake -Bbuild -GNinja \
+                  -DCMAKE_BUILD_TYPE=Release \
+                  -DCMAKE_C_COMPILER=clang \
+                  -DCMAKE_CXX_COMPILER=clang++  \
+                  -DCMAKE_BPFTOOL=bpftool \
+                  -DCMAKE_INSTALL_PREFIX=/usr
+              cmake --build build
+          EOF
+
+    - name: Export binary
+      uses: actions/upload-artifact@v4
+      with:
+        name: a4keyboard
+        path: build/src/a4keyboard
+        retention-days: 5
+
+    - name: Caching QEMU vm image
+      uses: actions/cache/save@v4
+      with:
+        path: .cache
+        key: ${{env.VM_IMAGE_URL}}
