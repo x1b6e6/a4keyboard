@@ -64,10 +64,11 @@ jobs:
           EOF
 
     - name: Export binary
-        uses: actions/upload-artifact@v4
-        with:
-          name: a4keyboard
-          path: build/src/a4keyboard
+      uses: actions/upload-artifact@v4
+      with:
+        name: a4keyboard
+        path: build/src/a4keyboard
+        retention-days: 5
 
     - name: Caching QEMU vm image
       uses: actions/cache/save@v4
