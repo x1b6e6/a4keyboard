@@ -52,7 +52,7 @@ jobs:
               sudo pacman-key --init
               sudo pacman-key --populate archlinux
               sudo pacman -Sy --noconfirm --needed archlinux-keyring
-              sudo pacman -S  --noconfirm --needed cmake clang ninja bpf libbpf lib32-gcc-libs
+              sudo pacman -Su  --noconfirm --needed cmake clang ninja bpf libbpf lib32-gcc-libs
               cd /project
               cmake -Bbuild -GNinja \
                   -DCMAKE_BUILD_TYPE=Release \
@@ -62,6 +62,12 @@ jobs:
                   -DCMAKE_INSTALL_PREFIX=/usr
               cmake --build build
           EOF
+
+    - name: Export binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: a4keyboard
+          path: build/src/a4keyboard
 
     - name: Caching QEMU vm image
       uses: actions/cache/save@v4
