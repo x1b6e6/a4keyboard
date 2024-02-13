@@ -32,16 +32,16 @@ jobs:
       run: wget -O "${{env.VM_IMAGE_PATH}}" "${{env.VM_IMAGE_URL}}"
 
     - name: Run QEMU and build 
-      run:
-        - export SSHPASS=${{env.SSHPASS}}
-        - qemu-system-x86_64 \
+      run: |
+          export SSHPASS=${{env.SSHPASS}}
+          qemu-system-x86_64 \
               -m 512 \
               -net nic -net user,hostfwd=tcp::2222-:22 \
               -drive file="${{env.VM_IMAGE_PATH}}",if=virtio \
               -virtfs local,path=${{github.workspace}},mount_tag=host0,security_model=passthrough,id=host0 \
               -nographic &
-        - timeout 15m sh -c "while ! sshpass -e ssh -o ConnectTimeout=2 -o StrictHostKeyChecking=no -l arch -p 2222 localhost sudo true; do sleep 1; done"
-        - sshpass -e ssh -o StrictHostKeyChecking=no -l arch -p 2222 localhost bash -eux <<EOF
+          timeout 15m sh -c "while ! sshpass -e ssh -o ConnectTimeout=2 -o StrictHostKeyChecking=no -l arch -p 2222 localhost sudo true; do sleep 1; done"
+          sshpass -e ssh -o StrictHostKeyChecking=no -l arch -p 2222 localhost bash -eux <<EOF
               trap 'sudo shutdown now' EXIT
               readonly PROJECTDIR=/project
               sudo mkdir "\$PROJECTDIR"
