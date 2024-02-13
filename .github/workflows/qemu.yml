@@ -19,7 +19,7 @@ jobs:
     - uses: actions/checkout@v3
 
     - name: Install dependencies
-      run: apt-get update && apt-get install -y wget qemu-system-x86-64 ssh sshpass
+      run: sudo apt-get update && sudo apt-get install -y wget qemu-system-x86-64 ssh sshpass
 
     - name: Restore cached QEMU image
       id: cache-restore
